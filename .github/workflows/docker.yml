@@ -1,10 +1,24 @@
-- name: Docker Setup Docker
-  uses: docker/setup-docker-action@v4.1.0
-  with:
-    version: v24.0.9  # Optional: specify Docker CE version
-    channel: stable   # Optional: specify Docker CE channel (e.g., stable, edge, or test)
-    daemon-config: '{"debug": true, "experimental": true}'  # JSON object formatted as a string
-    tcp-port: 2375  # Optional: TCP port to expose the Docker API locally
-    context: default  # Optional: Docker context name
-    set-host: true  # Set DOCKER_HOST environment variable to docker socket path
-    rootless: false  # Enable Docker rootless mode (set to true to enable rootless mode)
+name: Docker Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to trigger action'
+        required: true
+        default: 'main'
+
+jobs:
+  docker-setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4.1.0
+        with:
+          version: '24.10'
+          channel: 'stable'
+
+      - name: Run Docker build
+        run: |
+          docker build -t my-image .
