@@ -1,6 +1,6 @@
-document.getElementById("trigger-action").addEventListener("click", function() {
-    triggerDockerAction();
-});
+window.onload = function() {
+    triggerDockerAction(); // Automatically trigger the action on page load
+};
 
 async function triggerDockerAction() {
     const owner = 'electric-otter';  // Replace with your GitHub username
