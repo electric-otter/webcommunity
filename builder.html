@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Website Builder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            display: flex;
+        }
+        #sidebar {
+            width: 200px;
+            padding: 10px;
+            border-right: 1px solid #ccc;
+        }
+        #preview {
+            flex-grow: 1;
+            padding: 20px;
+            border-left: 1px solid #ccc;
+        }
+        .input-field {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Website Builder</h1>
+    <div id="container">
+        <div id="sidebar">
+            <h2>Editor</h2>
+            <div class="input-field">
+                <label for="title">Page Title:</label>
+                <input type="text" id="title" placeholder="Enter page title">
+            </div>
+            <div class="input-field">
+                <label for="heading">Heading:</label>
+                <input type="text" id="heading" placeholder="Enter heading text">
+            </div>
+            <div class="input-field">
+                <label for="paragraph">Paragraph:</label>
+                <textarea id="paragraph" placeholder="Enter paragraph text"></textarea>
+            </div>
+            <div class="input-field">
+                <label for="linkText">Link Text:</label>
+                <input type="text" id="linkText" placeholder="Enter link text">
+            </div>
+            <div class="input-field">
+                <label for="linkUrl">Link URL:</label>
+                <input type="text" id="linkUrl" placeholder="Enter link URL">
+            </div>
+            <button onclick="updatePreview()">Update Preview</button>
+            <button onclick="publishWebsite()">Publish</button>
+        </div>
+        
+        <div id="preview">
+            <h2>Preview</h2>
+            <div id="page-preview">
+                <h1>Preview your page</h1>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update preview content
+        function updatePreview() {
+            const title = document.getElementById('title').value;
+            const heading = document.getElementById('heading').value;
+            const paragraph = document.getElementById('paragraph').value;
+            const linkText = document.getElementById('linkText').value;
+            const linkUrl = document.getElementById('linkUrl').value;
+
+            // Update preview title
+            document.title = title;
+            
+            // Update preview content
+            const preview = document.getElementById('page-preview');
+            preview.innerHTML = `
+                <h1>${heading}</h1>
+                <p>${paragraph}</p>
+                <a href="${linkUrl}" target="_blank">${linkText}</a>
+            `;
+        }
+
+        // Publish website to your server
+        async function publishWebsite() {
+            const title = document.getElementById('title').value;
+            const heading = document.getElementById('heading').value;
+            const paragraph = document.getElementById('paragraph').value;
+            const linkText = document.getElementById('linkText').value;
+            const linkUrl = document.getElementById('linkUrl').value;
+
+            // Construct the HTML content to send
+            const htmlContent = `
+                <html>
+                    <head>
+                        <title>${title}</title>
+                    </head>
+                    <body>
+                        <h1>${heading}</h1>
+                        <p>${paragraph}</p>
+                        <a href="${linkUrl}" target="_blank">${linkText}</a>
+                    </body>
+                </html>
+            `;
+            
+            try {
+                // Send the HTML to your Docker server (this should be an endpoint that handles your domain creation)
+                const response = await fetch('http://your-docker-server-url/publish', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ html: htmlContent })
+                });
+                
+                // Handle response from server (Assuming the server responds with a domain)
+                const data = await response.json();
+                if (data.success) {
+                    const domain = data.domain;
+                    const infoText = `Your website has been published! Visit your site at ${domain}`;
+
+                    // Create and download info.txt
+                    downloadInfoFile(infoText);
+
+                    alert(`Website published successfully! Visit your site at ${domain}`);
+                } else {
+                    alert('Failed to publish website.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error publishing website.');
+            }
+        }
+
+        // Function to download info.txt with website information
+        function downloadInfoFile(content) {
+            const blob = new Blob([content], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'info.txt';
+            link.click();
+        }
+    </script>
+</body>
+</html>
+
+</html>
